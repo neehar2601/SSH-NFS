@@ -1,0 +1,64 @@
+
+
+
+Passwordless SSH Connection
+------------------------------------------------------------
+Configure Hosts
+sudo nano /etc/hosts/
+--inside host file
+	<ipaddress> client1
+
+Master Node
+
+sudo apt update
+sudo apt install mpich
+sudo apt install openssh-server openssh-client 
+sudo ssh-keygen -t rsa -b 4096
+sudo ssh-copy-id username<ipaddress>
+
+Client Node
+sudo apt  install openssh-server openssh-client
+sudo systemctl enable ssh
+sudo systemctl start ssh 
+sudo chmod 600~/.ssh/authorized_keys
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NFS
+--------------
+
+Master Node
+
+sudo apt update
+sudo apt install nfs-kernel-server -y
+sudo mkdir -p /mnt/shared
+sudo chmod 777 /mnt/shared
+sudo nano /etc/exports
+
+/mnt/shared *(rw,sync,no_subtree_check)  //(file path ip(rw,sync,no_subtree_check))
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+sudo systemctl enable nfs-kernel-server
+
+
+
+Client Node
+
+
+sudo apt update
+sudo apt install nfs-common -y
+sudo mkdir -p /mnt/nfs_shared
+sudo mount <server-ip>:/mnt/shared /mnt/nfs_shared
+ls /mnt/nfs_shared
+
+
+
+for permmenant mount
+in client
+sudo nano /etc/fstab
+<server-ip>:/mnt/shared /mnt/nfs_shared nfs defaults 0 0     //add this
+
+sudo mount -t nfs  -o nfsserver=4 <freenas-ip>:</mnt/pool-name/dataset>  <folderpath>
+
+or
+
+sudo mount  <freenas-ip>:</mnt/pool-name/dataset>  <mount-folderpath>
